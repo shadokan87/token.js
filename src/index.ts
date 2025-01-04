@@ -76,38 +76,53 @@ export class TokenJS implements TokenJSInterface {
 
   /**
    * Extends the predefined model list by adding a new model with specified features.
+   * This is useful for:
+   * 1. Adding AWS Bedrock models with regional prefixes like `us.anthropic.claude-3-sonnet`
+   * 2. Supporting new model versions like `gpt-4-1106-preview` before they're added to the predefined list
+   * 3. Using custom model deployments with unique names
+   * 4. Adding experimental or beta models during testing
    *
    * @param provider - The LLM provider (e.g., 'bedrock', 'openai')
    * @param name - The model name/identifier to add
    * @param featureSupport - Either:
-   *- A string matching an existing model name from the same provider to copy its feature support
-   *- An object specifying which features the model supports:
-   *| Feature    | Type    | Description                                  |
-   *|------------|---------|----------------------------------------------|
-   *| streaming  | boolean | Whether the model supports streaming responses|
-   *| json       | boolean | Whether the model supports JSON mode         |
-   *| toolCalls  | boolean | Whether the model supports function calling  |
-   *| images     | boolean | Whether the model supports image inputs      |
+   * - A string matching an existing model name from the same provider to copy its feature support
+   * - An object specifying which features the model supports:
+   * | Feature    | Type    | Description                                  |
+   * |------------|---------|----------------------------------------------|
+   * | streaming  | boolean | Whether the model supports streaming responses|
+   * | json       | boolean | Whether the model supports JSON mode         |
+   * | toolCalls  | boolean | Whether the model supports function calling  |
+   * | images     | boolean | Whether the model supports image inputs      |
    * @returns The TokenJS instance for chaining
    *
    * @example
    * ```typescript
-   * // Example from main.ts - Adding AWS Bedrock Claude models with region prefix
-   * // Note: 'as any' must be used here since the model name is not in the predefined list
-   * const tokenjs = new TokenJS().extendModelList(
+   * // Example in 2 steps: Adding AWS Bedrock Claude models with region prefix
+   * const tokenjs = new TokenJS();
+   *
+   * // Step 1: Register the new model name
+   * tokenjs.extendModelList(
    *   "bedrock",
-   *   'us.anthropic.claude-3-5-sonnet-20241022-v2:0' as any,
+   *   'us.anthropic.claude-3-5-sonnet-20241022-v2:0',
    *   "anthropic.claude-3-sonnet-20240229-v1:0" // Copy features from existing model
    * );
    *
-   * console.log(TokenJS.extendedModelList);
-   * // TokenJS.extendedModelList will contain:
-   * // [{
-   * //   provider: "bedrock",
-   * //   name: "us.anthropic.claude-3-5-sonnet-20241022-v2:0",
-   * //   featureSupport: "anthropic.claude-3-sonnet-20240229-v1:0"
-   * // }]
+   * // Step 2: Using the extended model in a chat completion
+   * const result = await tokenjs.chat.completions.create({
+   *   stream: true,
+   *   provider: 'bedrock',
+   *   model: 'us.anthropic.claude-3-5-sonnet-20241022-v2:0' as any, // Note: Type casting as 'any' required
+   *   messages: [
+   *     {
+   *       role: 'user',
+   *       content: 'Tell me about yourself.',
+   *     },
+   *   ],
+   * });
    * ```
+   *
+   * Note: When using extended models, you might need to use type casting (`as any`)
+   * for the model parameter until the type definitions are updated to include your custom model.
    */
   extendModelList<
     P extends Exclude<LLMProvider, 'openrouter' | 'openai-compatible'>

@@ -184,22 +184,30 @@ Token.js allows you to extend the predefined model list using the `extendModelLi
 ```ts
 import { TokenJS } from 'token.js'
 
-// Example from main.ts - Adding AWS Bedrock Claude models with region prefix
-// Note: 'as any' must be used here since the model name is not in the predefined list
-const tokenjs = new TokenJS().extendModelList(
+// Example in 2 steps: Adding AWS Bedrock Claude models with region prefix
+const tokenjs = new TokenJS();
+// Step 1: Register the new model name
+tokenjs.extendModelList(
   "bedrock",
-  'us.anthropic.claude-3-5-sonnet-20241022-v2:0' as any,
+  'us.anthropic.claude-3-5-sonnet-20241022-v2:0',
   "anthropic.claude-3-sonnet-20240229-v1:0" // Copy features from existing model
 );
 
-console.log(TokenJS.extendedModelList);
-// TokenJS.extendedModelList will contain:
-// [{
-//   provider: "bedrock",
-//   name: "us.anthropic.claude-3-5-sonnet-20241022-v2:0",
-//   featureSupport: "anthropic.claude-3-sonnet-20240229-v1:0"
-// }]
+// Step 2: Using the extended model in a chat completion
+const result = await tokenjs.chat.completions.create({
+  stream: true,
+  provider: 'bedrock',
+  model: 'us.anthropic.claude-3-5-sonnet-20241022-v2:0' as any, // Type casting as 'any' required
+  messages: [
+    {
+      role: 'user',
+      content: 'Tell me about yourself.',
+    },
+  ],
+});
 ```
+
+Note: When using extended models, you might need to use type casting (`as any`) for the model parameter.
 
 The `featureSupport` parameter can be either:
 - A string matching an existing model name from the same provider to copy its feature support
