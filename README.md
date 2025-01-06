@@ -1,5 +1,5 @@
 # Token.js
-
+> Note: This is a fork of the original Token.js project at https://github.com/token-js
 Integrate 200+ LLMs with one TypeScript SDK using OpenAI's format. Free and open source. No proxy server required.
 
 ## Features

@@ -1,6 +1,6 @@
 {
-  "name": "token.js",
-  "version": "0.4.7",
+  "name": "@shadokan87/token.js",
+  "version": "0.5.3",
   "description": "Integrate 9 LLM providers with a single Typescript SDK using OpenAIs format.",
   "main": "dist/index.cjs",
   "types": "dist/index.d.ts",
@@ -65,5 +65,8 @@
     "typescript": "^5.5.3",
     "vite-node": "^1.6.0",
     "vitest": "^2.0.1"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
